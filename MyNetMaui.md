@@ -102,6 +102,211 @@ xcrun simctl list devices
 
 ---
 
+## 📚 ¿Qué es MVVM? (Explicación Simple)
+
+### 🎯 La Analogía del Restaurante
+
+Imagina que estás construyendo un restaurante. MVVM es como organizar tu restaurante en 3 áreas:
+
+```mermaid
+graph LR
+    A[👨‍🍳 Cocina<br/>Model] --> B[🔔 Meseros<br/>ViewModel] 
+    B --> C[🪑 Comedor<br/>View]
+    C --> B
+    
+    style A fill:#ff6b6b
+    style B fill:#ffeaa7
+    style C fill:#96ceb4
+```
+
+1. **View (Vista)** = **El Comedor** 🪑
+   - Es lo que el cliente ve y toca
+   - Los botones, etiquetas, cajas de texto
+   - Solo se encarga de verse bonita
+   - **Ejemplo**: El botón "Click me" en tu pantalla
+
+2. **ViewModel** = **Los Meseros** 🔔
+   - Hace de intermediario entre la cocina y el comedor
+   - Toma las órdenes del cliente (clicks, inputs)
+   - Trae la comida de la cocina
+   - **Ejemplo**: El código que cuenta cuántos clicks has hecho
+
+3. **Model (Modelo)** = **La Cocina** 👨‍🍳
+   - Donde se prepara la comida (los datos)
+   - La base de datos, archivos, internet
+   - **Ejemplo**: Una lista de tareas guardadas en SQLite
+
+### ✅ ¿Por qué es Mejor MVVM?
+
+**SIN MVVM (Todo revuelto):**
+```
+❌ El mesero cocina, sirve y limpia
+❌ Si cambias la receta, tienes que cambiar TODO
+❌ Difícil de probar y mantener
+```
+
+**CON MVVM (Organizado):**
+```
+✅ Cada uno hace su trabajo
+✅ Puedes cambiar la cocina sin tocar el comedor
+✅ Puedes cambiar el diseño sin tocar la lógica
+✅ Fácil de probar cada parte
+```
+
+### 🎨 MVVM en Nuestro Proyecto (Ejemplo Real)
+
+Vamos a ver cómo funciona con el contador de clicks:
+
+#### 1️⃣ **View (MainPage.xaml)** - Lo que VES
+```xaml
+<!-- El botón que el usuario ve y toca -->
+<Button 
+    Text="{Binding Counter, StringFormat='Clic: {0}'}" 
+    Command="{Binding IncrementCounterCommand}" />
+```
+**En español**: "Botón, muestra el valor de Counter y cuando te toquen, ejecuta IncrementCounterCommand"
+
+#### 2️⃣ **ViewModel (MainViewModel.cs)** - La LÓGICA
+```csharp
+public partial class MainViewModel : BaseViewModel
+{
+    [ObservableProperty]
+    private int counter; // El número que se muestra
+    
+    [RelayCommand]
+    private void IncrementCounter()
+    {
+        Counter++; // Aumenta el contador
+        WelcomeMessage = $"Has hecho clic {Counter} veces";
+    }
+}
+```
+**En español**: 
+- `Counter` es un número que la Vista puede mostrar
+- `IncrementCounter` es lo que pasa cuando tocas el botón
+- Cuando `Counter` cambia, la Vista se actualiza AUTOMÁTICAMENTE ✨
+
+#### 3️⃣ **La Magia: Data Binding** 🪄
+
+```mermaid
+sequenceDiagram
+    participant U as 👤 Usuario
+    participant V as 📱 View<br/>(Botón)
+    participant VM as 🧠 ViewModel<br/>(Lógica)
+    
+    U->>V: Toca el botón
+    V->>VM: Ejecuta IncrementCounterCommand
+    VM->>VM: Counter++
+    VM->>V: Notifica: "Counter cambió!"
+    V->>V: Actualiza el texto del botón
+    V->>U: Muestra "Clic: 1"
+```
+
+**Lo mágico**: No tienes que escribir código para actualizar la pantalla. ¡Se actualiza sola! 🎉
+
+### 🛠️ Herramientas que Usamos
+
+#### CommunityToolkit.Mvvm
+
+Es como tener un asistente que escribe código aburrido por ti:
+
+**Sin el toolkit (mucho código):**
+```csharp
+private int _counter;
+public int Counter
+{
+    get => _counter;
+    set
+    {
+        if (_counter != value)
+        {
+            _counter = value;
+            OnPropertyChanged(nameof(Counter));
+        }
+    }
+}
+```
+
+**Con el toolkit (código mágico ✨):**
+```csharp
+[ObservableProperty]
+private int counter;
+```
+¡Una línea vs 10 líneas! El toolkit genera el resto automáticamente.
+
+### 📋 Estructura de Nuestro Proyecto
+
+Así organizamos los archivos:
+
+```
+MiAppMaui/
+├── 📁 Views/                    ← Lo que VES (pantallas)
+│   └── MainPage.xaml           "La interfaz bonita"
+│
+├── 📁 ViewModels/               ← La LÓGICA (cerebro)
+│   ├── BaseViewModel.cs        "Funciones comunes para todos"
+│   └── MainViewModel.cs        "Lógica de la página principal"
+│
+├── 📁 Models/                   ← Los DATOS (estructura)
+│   └── (próximamente: Todo.cs, Note.cs)
+│
+└── 📁 Services/                 ← Los SERVICIOS (ayudantes)
+    └── (próximamente: DatabaseService.cs)
+```
+
+### 🎯 Beneficios Reales en Nuestro Proyecto
+
+| Beneficio | ¿Qué significa para ti? |
+|-----------|------------------------|
+| **Separación clara** | Si quieres cambiar el color de un botón → solo tocas la Vista<br/>Si quieres cambiar la lógica → solo tocas el ViewModel |
+| **Reutilización** | El mismo ViewModel puede usarse en Android, iOS y Windows |
+| **Testing fácil** | Puedes probar la lógica sin abrir la app visualmente |
+| **Trabajo en equipo** | Un diseñador cambia la Vista, un programador cambia la lógica |
+| **Mantenimiento** | Encuentras bugs más rápido porque todo está organizado |
+
+### 🚀 ¿Cómo lo Usamos?
+
+#### Paso 1: Registrar en `MauiProgram.cs`
+```csharp
+// Le decimos a la app: "Cuando alguien pida MainViewModel, crea uno"
+builder.Services.AddSingleton<MainViewModel>();
+builder.Services.AddSingleton<MainPage>();
+```
+
+#### Paso 2: Conectar en `MainPage.xaml.cs`
+```csharp
+public MainPage(MainViewModel viewModel)
+{
+    InitializeComponent();
+    BindingContext = viewModel; // ¡Conectamos la Vista con el ViewModel!
+}
+```
+
+#### Paso 3: Usar en `MainPage.xaml`
+```xaml
+<!-- Le decimos al compilador: "Este ViewModel tiene estas propiedades" -->
+x:DataType="vm:MainViewModel"
+
+<!-- Ahora podemos usar las propiedades -->
+Text="{Binding Counter}"
+Command="{Binding IncrementCounterCommand}"
+```
+
+### 💡 Tip para Principiantes
+
+**Piensa en MVVM como una conversación:**
+
+1. **Usuario**: Toca un botón (View)
+2. **Botón**: "¡Oye ViewModel, me tocaron!" (Command)
+3. **ViewModel**: "Ok, voy a hacer el trabajo..." (Lógica)
+4. **ViewModel**: "¡Listo! El contador cambió" (Property Changed)
+5. **View**: "¿Cambió? ¡Voy a actualizarme!" (Binding)
+6. **Usuario**: Ve el cambio en la pantalla ✨
+
+**Todo esto pasa AUTOMÁTICAMENTE con MVVM. No tienes que escribir código para cada paso.**
+
+---
+
 ## 🏗️ Arquitectura del Proyecto
 
 ```mermaid
@@ -356,14 +561,17 @@ pie title Tipos de Gráficos a Implementar
 - [ ] Testing en emulador Android
 - [ ] Testing en iOS Simulator
 
-### Fase 2: Estructura del Proyecto 📋
-- [ ] Crear carpetas de arquitectura
-- [ ] Implementar patrón MVVM
-- [ ] Configurar Shell Navigation
-- [ ] Crear BaseViewModel
-- [ ] Setup Dependency Injection
-- [ ] Configurar SQLite
-- [ ] Crear modelos de datos
+### Fase 2: Estructura del Proyecto �
+- [x] Crear carpetas de arquitectura (Models, ViewModels, Views, Services, etc.)
+- [x] Implementar patrón MVVM con CommunityToolkit
+- [x] Crear BaseViewModel con propiedades comunes
+- [x] Crear MainViewModel con lógica de contador
+- [x] Configurar Dependency Injection en MauiProgram
+- [x] Instalar paquetes: CommunityToolkit.Mvvm, SQLite, CommunityToolkit.Maui
+- [x] Migrar MainPage a arquitectura MVVM
+- [ ] Configurar Shell Navigation avanzada
+- [ ] Configurar SQLite DatabaseService
+- [ ] Crear modelos de datos iniciales
 
 ### Fase 3: Sistema de Temas 🎨
 - [ ] Crear ThemeService
@@ -798,16 +1006,21 @@ graph TD
 - ✅ App ejecutándose en Windows
 - ✅ .gitignore configurado correctamente
 - ✅ Proyecto subido a GitHub: [erdnando/myNetMaui](https://github.com/erdnando/myNetMaui)
+- ✅ Arquitectura MVVM implementada con CommunityToolkit
+- ✅ Dependency Injection configurada
+- ✅ Estructura de carpetas organizada (Models, ViewModels, Views, Services)
+- ✅ Paquetes instalados: CommunityToolkit.Mvvm, SQLite, CommunityToolkit.Maui
 
 ### 🔄 Próximos Pasos Inmediatos
-1. **Estructurar proyecto con MVVM** (crear carpetas y arquitectura)
-2. **Instalar paquetes necesarios** (CommunityToolkit.Mvvm, SQLite)
-3. **Configurar emulador Android** para testing mobile (opcional por ahora)
+1. **Configurar DatabaseService** con SQLite para persistir datos
+2. **Crear modelos de datos** (Todo, Note, User)
+3. **Implementar Shell Navigation** con TabBar y Flyout
+4. **Sistema de temas** (modo oscuro/claro)
 
 ### 📊 Progreso General
 ```
 Fase 1: Configuración    ██████████ 100% ✅
-Fase 2: Estructura       ░░░░░░░░░░   0%
+Fase 2: Estructura       ███████░░░  70% 🔄
 Fase 3: Temas           ░░░░░░░░░░   0%
 ```
 
@@ -1049,5 +1262,5 @@ Este documento es una guía viva que se irá actualizando conforme avancemos. El
 
 ---
 
-*Última actualización: 23 de Diciembre, 2025 - 19:00*
-*Estado: ✅ Fase 1 completada, código en GitHub, lista para arquitectura MVVM*
+*Última actualización: 23 de Diciembre, 2025 - 19:30*
+*Estado: ✅ Fase 1 completada | 🔄 Fase 2 al 70% - MVVM implementado y funcionando*
