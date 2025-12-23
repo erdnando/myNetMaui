@@ -3,6 +3,7 @@
 ## 📋 Índice
 - [Introducción](#introducción)
 - [Ambiente de Desarrollo](#ambiente-de-desarrollo)
+- [Gitflow y Gestión de Ramas](#gitflow-y-gestión-de-ramas)
 - [Arquitectura del Proyecto](#arquitectura-del-proyecto)
 - [Roadmap de Desarrollo](#roadmap-de-desarrollo)
 - [Características "WOW"](#características-wow)
@@ -99,6 +100,388 @@ xcode-select --install
 # Listar simuladores disponibles
 xcrun simctl list devices
 ```
+
+---
+
+## 🌿 Gitflow y Gestión de Ramas
+
+### 🎯 ¿Qué es Gitflow? (Explicación Simple)
+
+Imagina que estás construyendo una casa. Gitflow es como organizar tu equipo de construcción:
+
+```mermaid
+gitGraph
+    commit id: "Inicio"
+    branch develop
+    checkout develop
+    commit id: "Base"
+    branch feature/login
+    checkout feature/login
+    commit id: "Login UI"
+    commit id: "Login Logic"
+    checkout develop
+    merge feature/login
+    branch release/1.0
+    checkout release/1.0
+    commit id: "Fix bugs"
+    checkout main
+    merge release/1.0 tag: "v1.0"
+    checkout develop
+    merge release/1.0
+    branch hotfix/critical-bug
+    checkout hotfix/critical-bug
+    commit id: "Fix crash"
+    checkout main
+    merge hotfix/critical-bug tag: "v1.0.1"
+    checkout develop
+    merge hotfix/critical-bug
+```
+
+### 📚 Las 5 Ramas Principales
+
+#### 1. **main** (Producción) 🏠
+- **¿Qué es?** La versión "oficial" que está en la tienda/producción
+- **Analogía**: La casa terminada que está lista para vender
+- **Reglas**: 
+  - ❌ NUNCA trabajas directamente aquí
+  - ✅ Solo recibe código 100% probado y listo
+  - 🏷️ Cada commit aquí = nueva versión (v1.0, v1.1, etc.)
+
+#### 2. **develop** (Desarrollo) 🏗️
+- **¿Qué es?** Donde integras todo lo que están haciendo
+- **Analogía**: El plano general donde se juntan todos los planos individuales
+- **Reglas**:
+  - ❌ NUNCA trabajas directamente aquí
+  - ✅ Aquí se juntan las features terminadas
+  - 📦 Desde aquí salen las versiones para probar
+
+#### 3. **feature/*** (Nueva Funcionalidad) 🔨
+- **¿Qué es?** Una rama para cada cosa nueva que desarrolles
+- **Analogía**: Un obrero trabajando en su propia área sin molestar a otros
+- **Ejemplos**:
+  - `feature/login` → Sistema de inicio de sesión
+  - `feature/dark-theme` → Modo oscuro
+  - `feature/todo-list` → Lista de tareas
+- **Reglas**:
+  - ✅ Trabajas libremente aquí
+  - ✅ Cuando termines, la integras a `develop`
+  - 🗑️ Se borra después de integrar
+
+#### 4. **release/*** (Pre-lanzamiento) 📦
+- **¿Qué es?** Preparación final antes de lanzar una versión
+- **Analogía**: Inspección final antes de entregar la casa
+- **Ejemplos**:
+  - `release/1.0` → Primera versión
+  - `release/2.0` → Segunda versión mayor
+- **Reglas**:
+  - 🐛 Solo correcciones de bugs pequeños
+  - ❌ No se agregan features nuevas
+  - ✅ Se integra a `main` Y `develop` cuando está lista
+
+#### 5. **hotfix/*** (Reparación de Emergencia) 🚑
+- **¿Qué es?** Para arreglar bugs URGENTES en producción
+- **Analogía**: Plomero de emergencia cuando hay una fuga
+- **Ejemplos**:
+  - `hotfix/crash-on-startup` → App no abre
+  - `hotfix/payment-error` → Error crítico en pagos
+- **Reglas**:
+  - 🔥 Solo para emergencias
+  - ✅ Sale de `main`, se integra a `main` Y `develop`
+  - ⚡ Rápido y directo
+
+### 🎨 Flujo de Trabajo Visual
+
+```mermaid
+graph TD
+    A[🎯 Nueva Tarea] --> B{¿Qué tipo?}
+    
+    B -->|Feature nueva| C[Crear feature/nombre]
+    B -->|Bug urgente en producción| D[Crear hotfix/nombre]
+    B -->|Preparar release| E[Crear release/version]
+    
+    C --> F[Desarrollar]
+    F --> G[Commit frecuentes]
+    G --> H{¿Terminado?}
+    H -->|No| F
+    H -->|Sí| I[Merge a develop]
+    
+    D --> J[Arreglar rápido]
+    J --> K[Merge a main]
+    K --> L[Merge a develop]
+    
+    E --> M[Última revisión]
+    M --> N[Merge a main]
+    N --> O[Tag versión]
+    O --> P[Merge a develop]
+    
+    style A fill:#667eea
+    style C fill:#96ceb4
+    style D fill:#ff6b6b
+    style E fill:#ffeaa7
+    style I fill:#34D399
+    style K fill:#f87171
+    style N fill:#818CF8
+```
+
+### 🚀 Comandos Prácticos de Gitflow
+
+#### Configuración Inicial (Solo una vez)
+
+```bash
+# 1. Asegurarte de estar en main
+git checkout main
+
+# 2. Crear rama develop
+git checkout -b develop
+
+# 3. Subir develop al repositorio
+git push -u origin develop
+```
+
+#### Trabajar en una Nueva Feature
+
+```bash
+# 1. Asegurarte de estar actualizado
+git checkout develop
+git pull origin develop
+
+# 2. Crear rama feature
+git checkout -b feature/nombre-de-tu-feature
+
+# 3. Trabajar y hacer commits
+git add .
+git commit -m "feat: descripción de lo que hiciste"
+
+# 4. Subir tu feature (opcional, para backup)
+git push -u origin feature/nombre-de-tu-feature
+
+# 5. Cuando termines, integrar a develop
+git checkout develop
+git pull origin develop
+git merge feature/nombre-de-tu-feature
+
+# 6. Subir develop con tu feature
+git push origin develop
+
+# 7. Borrar la rama feature (ya no la necesitas)
+git branch -d feature/nombre-de-tu-feature
+git push origin --delete feature/nombre-de-tu-feature
+```
+
+#### Preparar un Release
+
+```bash
+# 1. Desde develop, crear rama release
+git checkout develop
+git checkout -b release/1.0
+
+# 2. Hacer ajustes finales (solo bugs, no features)
+git add .
+git commit -m "fix: corregir bug menor antes de release"
+
+# 3. Cuando esté listo, integrar a main
+git checkout main
+git merge release/1.0
+
+# 4. Etiquetar la versión
+git tag -a v1.0 -m "Versión 1.0 - Primer release"
+git push origin main --tags
+
+# 5. También integrar a develop (para que tenga los fixes)
+git checkout develop
+git merge release/1.0
+git push origin develop
+
+# 6. Borrar rama release
+git branch -d release/1.0
+git push origin --delete release/1.0
+```
+
+#### Hotfix de Emergencia
+
+```bash
+# 1. Desde main, crear hotfix
+git checkout main
+git checkout -b hotfix/nombre-del-bug
+
+# 2. Arreglar el bug
+git add .
+git commit -m "hotfix: descripción del arreglo urgente"
+
+# 3. Integrar a main
+git checkout main
+git merge hotfix/nombre-del-bug
+
+# 4. Etiquetar nueva versión
+git tag -a v1.0.1 -m "Hotfix: descripción"
+git push origin main --tags
+
+# 5. También integrar a develop
+git checkout develop
+git merge hotfix/nombre-del-bug
+git push origin develop
+
+# 6. Borrar rama hotfix
+git branch -d hotfix/nombre-del-bug
+```
+
+### 📋 Guía Rápida de Referencia
+
+#### ¿En qué rama debo trabajar?
+
+| Situación | Rama a usar | Comando |
+|-----------|-------------|---------|
+| Nueva funcionalidad | `feature/nombre` | `git checkout -b feature/nombre` |
+| Bug normal | `feature/fix-nombre` | `git checkout -b feature/fix-nombre` |
+| Bug urgente en producción | `hotfix/nombre` | `git checkout main && git checkout -b hotfix/nombre` |
+| Preparar release | `release/version` | `git checkout develop && git checkout -b release/1.0` |
+| Ver qué hay en producción | `main` | `git checkout main` |
+| Ver últimos avances | `develop` | `git checkout develop` |
+
+#### Comandos Útiles del Día a Día
+
+```bash
+# Ver en qué rama estás
+git branch
+
+# Ver todas las ramas (locales y remotas)
+git branch -a
+
+# Cambiar de rama
+git checkout nombre-rama
+
+# Ver el estado actual
+git status
+
+# Ver el historial bonito
+git log --oneline --graph --all
+
+# Actualizar tu rama con lo último de develop
+git checkout tu-rama
+git merge develop
+
+# Ver diferencias antes de commit
+git diff
+
+# Deshacer último commit (conservando cambios)
+git reset --soft HEAD~1
+
+# Ver ramas remotas
+git remote show origin
+```
+
+### 🎯 Convenciones de Nombres
+
+#### Features
+```bash
+feature/login           # Sistema de login
+feature/dark-theme      # Modo oscuro
+feature/database        # Setup de base de datos
+feature/charts          # Gráficos
+feature/animations      # Animaciones
+```
+
+#### Fixes
+```bash
+feature/fix-navigation  # Arreglo de navegación
+feature/fix-layout      # Arreglo de diseño
+hotfix/crash-on-start   # Solo si es URGENTE en producción
+```
+
+#### Releases
+```bash
+release/1.0    # Primera versión
+release/1.1    # Versión menor
+release/2.0    # Versión mayor
+```
+
+### 💡 Tips y Mejores Prácticas
+
+#### ✅ DO (Hazlo)
+- ✅ Haz commits pequeños y frecuentes
+- ✅ Usa mensajes descriptivos (`feat: agregar login`, no `cambios`)
+- ✅ Mantén `develop` siempre funcional
+- ✅ Haz pull antes de empezar a trabajar
+- ✅ Borra ramas después de integrarlas
+- ✅ Usa prefijos en commits: `feat:`, `fix:`, `ui:`, `docs:`
+- ✅ Prueba tu código antes de merge
+
+#### ❌ DON'T (No hagas)
+- ❌ No trabajes directamente en `main` o `develop`
+- ❌ No hagas commits gigantes
+- ❌ No uses mensajes vagos (`fix`, `cambios`, `test`)
+- ❌ No dejes ramas sin usar
+- ❌ No hagas merge sin probar antes
+- ❌ No subas archivos temporales o `bin/`, `obj/`
+- ❌ No uses `git push -f` (force) a menos que sepas lo que haces
+
+### 🎮 Ejemplo Práctico: Tu Primer Feature
+
+Vamos a agregar el sistema de temas oscuros paso a paso:
+
+```bash
+# 1. Empezar desde develop actualizado
+git checkout develop
+git pull origin develop
+
+# 2. Crear tu rama feature
+git checkout -b feature/dark-theme
+
+# 3. Hacer cambios en el código
+# (Aquí desarrollas el tema oscuro)
+
+# 4. Guardar tu progreso
+git add .
+git commit -m "feat: agregar colores para tema oscuro"
+
+# 5. Continuar desarrollando
+# (Más código...)
+git add .
+git commit -m "feat: agregar toggle de tema en settings"
+
+# 6. Más desarrollo...
+git add .
+git commit -m "feat: persistir preferencia de tema"
+
+# 7. Probar que todo funciona
+dotnet build
+dotnet run -f net9.0-windows10.0.19041.0
+
+# 8. Si todo está bien, integrar a develop
+git checkout develop
+git pull origin develop          # Por si alguien más hizo cambios
+git merge feature/dark-theme     # Integrar tu feature
+
+# 9. Subir a GitHub
+git push origin develop
+
+# 10. Limpiar: borrar la rama feature
+git branch -d feature/dark-theme
+git push origin --delete feature/dark-theme  # Borrar del remoto también
+```
+
+### 📊 Estado Actual de las Ramas
+
+```mermaid
+gitGraph
+    commit id: "Initial"
+    commit id: "Project setup"
+    commit id: "MVVM implementation" tag: "actual"
+```
+
+### 🚀 Próximos Pasos con Gitflow
+
+1. ✅ **Crear rama `develop`** (lo haremos ahora)
+2. 🔄 **Primera feature**: `feature/database-service`
+3. 🔄 **Segunda feature**: `feature/models`
+4. 🔄 **Tercera feature**: `feature/shell-navigation`
+5. 📦 **Primer release**: `release/1.0` cuando tengamos features básicas completas
+
+### 🎓 Recursos para Aprender Más
+
+- [Gitflow Original](https://nvie.com/posts/a-successful-git-branching-model/)
+- [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) (alternativa más simple)
+- [Git Cheat Sheet](https://education.github.com/git-cheat-sheet-education.pdf)
 
 ---
 
