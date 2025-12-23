@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:vm="clr-namespace:MiAppMaui.ViewModels"
+             xmlns:models="clr-namespace:MiAppMaui.Models"
+             x:Class="MiAppMaui.Views.NotesPage"
+             x:DataType="vm:NotesViewModel"
+             Title="{Binding Title}">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing"
+                                       Command="{Binding LoadNotesCommand}" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Header con búsqueda -->
+        <VerticalStackLayout Padding="20,20,20,10" Spacing="10">
+            <Label Text="📝 Mis Notas"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
+
+            <!-- Barra de búsqueda -->
+            <Border Stroke="{StaticResource Primary}"
+                    StrokeThickness="2"
+                    BackgroundColor="{StaticResource Gray100}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="25"/>
+                </Border.StrokeShape>
+                <Grid ColumnDefinitions="*,Auto" Padding="15,10">
+                    <Entry Grid.Column="0"
+                           Text="{Binding SearchText}"
+                           Placeholder="Buscar notas..."
+                           BackgroundColor="Transparent"/>
+                    <Label Grid.Column="1"
+                           Text="🔍"
+                           FontSize="20"
+                           VerticalOptions="Center"/>
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <!-- Lista de notas -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20,10" Spacing="15">
+                
+                <!-- Mensaje si no hay notas -->
+                <VerticalStackLayout Spacing="20"
+                                    IsVisible="{Binding Notes.Count, Converter={StaticResource IsZeroConverter}}"
+                                    Padding="20"
+                                    VerticalOptions="Center">
+                    <Label Text="📭"
+                           FontSize="80"
+                           HorizontalOptions="Center"/>
+                    <Label Text="No tienes notas aún"
+                           FontSize="20"
+                           HorizontalOptions="Center"
+                           TextColor="{StaticResource Gray600}"/>
+                    <Label Text="Toca el botón + para crear una"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           TextColor="{StaticResource Gray400}"/>
+                </VerticalStackLayout>
+
+                <!-- Notas -->
+                <CollectionView ItemsSource="{Binding Notes}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Note">
+                            <SwipeView>
+                                <!-- Swipe Actions -->
+                                <SwipeView.LeftItems>
+                                    <SwipeItems>
+                                        <SwipeItem Text="⭐"
+                                                  BackgroundColor="#FFD700"
+                                                  Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NotesViewModel}}, Path=ToggleFavoriteCommand}"
+                                                  CommandParameter="{Binding .}"/>
+                                    </SwipeItems>
+                                </SwipeView.LeftItems>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem Text="🗑️"
+                                                  BackgroundColor="#EF4444"
+                                                  Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NotesViewModel}}, Path=DeleteNoteCommand}"
+                                                  CommandParameter="{Binding .}"/>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+
+                                <!-- Card de nota -->
+                                <Border Margin="0,5"
+                                        BackgroundColor="{Binding Color}"
+                                        StrokeThickness="0">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="15"/>
+                                    </Border.StrokeShape>
+                                    <Border.Shadow>
+                                        <Shadow Brush="Black"
+                                               Offset="0,5"
+                                               Radius="10"
+                                               Opacity="0.3"/>
+                                    </Border.Shadow>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer 
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NotesViewModel}}, Path=ShowEditFormCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    </Border.GestureRecognizers>
+
+                                    <Grid Padding="15" RowDefinitions="Auto,Auto,Auto">
+                                        <!-- Título y favorito -->
+                                        <HorizontalStackLayout Spacing="10">
+                                            <Label Text="{Binding Title}"
+                                                   FontSize="18"
+                                                   FontAttributes="Bold"
+                                                   TextColor="White"
+                                                   HorizontalOptions="Start"
+                                                   VerticalOptions="Center"/>
+                                            <Label Text="⭐"
+                                                   FontSize="16"
+                                                   IsVisible="{Binding IsFavorite}"
+                                                   VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+
+                                        <!-- Contenido -->
+                                        <Label Grid.Row="1"
+                                               Text="{Binding Content}"
+                                               FontSize="14"
+                                               TextColor="White"
+                                               Opacity="0.9"
+                                               MaxLines="3"
+                                               LineBreakMode="TailTruncation"
+                                               Margin="0,8,0,0"/>
+
+                                        <!-- Footer -->
+                                        <HorizontalStackLayout Grid.Row="2" 
+                                                             Spacing="15"
+                                                             Margin="0,10,0,0">
+                                            <Label Text="{Binding Category}"
+                                                   FontSize="12"
+                                                   TextColor="White"
+                                                   Padding="8,4"
+                                                   BackgroundColor="#40FFFFFF">
+                                                <Label.Shadow>
+                                                    <Shadow Brush="Transparent"/>
+                                                </Label.Shadow>
+                                            </Label>
+                                            <Label Text="{Binding UpdatedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                                   FontSize="12"
+                                                   TextColor="White"
+                                                   Opacity="0.8"
+                                                   VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Botón flotante para agregar -->
+        <Border Grid.Row="2"
+                WidthRequest="70"
+                HeightRequest="70"
+                BackgroundColor="{StaticResource Primary}"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="20,20,20,30"
+                IsVisible="{Binding ShowForm, Converter={StaticResource InvertedBoolConverter}}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="35"/>
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow Brush="Black"
+                       Offset="0,5"
+                       Radius="15"
+                       Opacity="0.4"/>
+            </Border.Shadow>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ShowAddFormCommand}"/>
+            </Border.GestureRecognizers>
+            <Label Text="+"
+                   FontSize="40"
+                   TextColor="White"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
+        </Border>
+
+        <!-- Formulario (Modal) -->
+        <Grid Grid.RowSpan="3"
+              BackgroundColor="#DD000000"
+              IsVisible="{Binding ShowForm}">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CancelFormCommand}"/>
+            </Grid.GestureRecognizers>
+
+            <Border BackgroundColor="White"
+                    VerticalOptions="Center"
+                    Margin="20"
+                    Padding="20">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20"/>
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer/>
+                </Border.GestureRecognizers>
+
+                <ScrollView>
+                    <VerticalStackLayout Spacing="15">
+                        
+                        <Label Text="{Binding IsEditing, Converter={StaticResource BoolToStringConverter}, ConverterParameter='✏️ Editar Nota|➕ Nueva Nota'}"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"/>
+
+                        <Entry Placeholder="Título *"
+                               Text="{Binding NoteTitle}"
+                               FontSize="18"
+                               TextColor="Black"
+                               PlaceholderColor="Gray"/>
+
+                        <Editor Placeholder="Contenido..."
+                                Text="{Binding NoteContent}"
+                                HeightRequest="150"
+                                AutoSize="TextChanges"
+                                TextColor="Black"
+                                PlaceholderColor="Gray"/>
+
+                        <Entry Placeholder="Categoría"
+                               Text="{Binding NoteCategory}"
+                               FontSize="16"
+                               TextColor="Black"
+                               PlaceholderColor="Gray"/>
+
+                        <Label Text="Selecciona un color:"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+
+                        <FlexLayout Wrap="Wrap"
+                                   JustifyContent="SpaceEvenly">
+                            <Frame Padding="0"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   CornerRadius="25"
+                                   BackgroundColor="#667eea"
+                                   Margin="5">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectColorCommand}"
+                                                        CommandParameter="#667eea"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame Padding="0"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   CornerRadius="25"
+                                   BackgroundColor="#f093fb"
+                                   Margin="5">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectColorCommand}"
+                                                        CommandParameter="#f093fb"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame Padding="0"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   CornerRadius="25"
+                                   BackgroundColor="#43e97b"
+                                   Margin="5">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectColorCommand}"
+                                                        CommandParameter="#43e97b"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame Padding="0"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   CornerRadius="25"
+                                   BackgroundColor="#ff6b6b"
+                                   Margin="5">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectColorCommand}"
+                                                        CommandParameter="#ff6b6b"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                        </FlexLayout>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                            <Button Grid.Column="0"
+                                    Text="Cancelar"
+                                    Command="{Binding CancelFormCommand}"
+                                    BackgroundColor="{StaticResource Gray300}"
+                                    TextColor="Black"/>
+                            <Button Grid.Column="1"
+                                    Text="Guardar"
+                                    Command="{Binding SaveNoteCommand}"
+                                    BackgroundColor="{StaticResource Primary}"
+                                    TextColor="White"/>
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>

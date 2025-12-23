@@ -54,19 +54,42 @@
     </Shell.FlyoutHeader>
 
     <!-- Contenido del menú -->
-    <FlyoutItem Title="Inicio">
+    <FlyoutItem Title="🏠 Inicio">
         <ShellContent
             Title="Login"
             ContentTemplate="{DataTemplate views:LoginPage}"
             Route="LoginPage" />
     </FlyoutItem>
 
-    <FlyoutItem Title="Mi Perfil"
+    <FlyoutItem Title="👤 Mi Perfil"
                 IsVisible="{Binding IsLoggedIn}">
         <ShellContent
             Title="Home"
             ContentTemplate="{DataTemplate views:MainPage}"
             Route="MainPage" />
+    </FlyoutItem>
+
+    <!-- CRUD con SQLite -->
+    <FlyoutItem Title="Mis Notas">
+        <ShellContent
+            Title="Notas"
+            ContentTemplate="{DataTemplate views:NotesPage}"
+            Route="NotesPage" />
+    </FlyoutItem>
+
+    <!-- Demo Pages -->
+    <FlyoutItem Title="🎬 Animaciones">
+        <ShellContent
+            Title="Animaciones"
+            ContentTemplate="{DataTemplate views:AnimationsPage}"
+            Route="AnimationsPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="🎨 Controles UI">
+        <ShellContent
+            Title="Controles UI"
+            ContentTemplate="{DataTemplate views:UIControlsPage}"
+            Route="UIControlsPage" />
     </FlyoutItem>
 
     <!-- Footer del Flyout con botón de cerrar sesión -->

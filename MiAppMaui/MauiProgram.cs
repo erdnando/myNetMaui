@@ -29,11 +29,17 @@ public static class MauiProgram
 		builder.Services.AddSingleton<MainViewModel>();
 		builder.Services.AddSingleton<AppShellViewModel>();
 		builder.Services.AddTransient<LoginViewModel>();
+		builder.Services.AddTransient<AnimationsViewModel>();
+		builder.Services.AddTransient<UIControlsViewModel>();
+		builder.Services.AddTransient<NotesViewModel>();
 		
 		// Registrar Views
 		builder.Services.AddSingleton<MainPage>();
 		builder.Services.AddSingleton<AppShell>();
 		builder.Services.AddTransient<LoginPage>();
+		builder.Services.AddTransient<AnimationsPage>();
+		builder.Services.AddTransient<UIControlsPage>();
+		builder.Services.AddTransient<NotesPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();
