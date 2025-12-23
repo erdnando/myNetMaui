@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui;
 using MiAppMaui.ViewModels;
 using MiAppMaui.Views;
+using MiAppMaui.Services;
 
 namespace MiAppMaui;
 
@@ -19,6 +20,9 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
+		// Registrar Services
+		builder.Services.AddSingleton<DatabaseService>();
+		
 		// Registrar ViewModels
 		builder.Services.AddSingleton<MainViewModel>();
 		
