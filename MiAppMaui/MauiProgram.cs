@@ -22,12 +22,18 @@ public static class MauiProgram
 
 		// Registrar Services
 		builder.Services.AddSingleton<DatabaseService>();
+		builder.Services.AddSingleton<GoogleAuthService>();
+		builder.Services.AddSingleton<UserSessionService>();
 		
 		// Registrar ViewModels
 		builder.Services.AddSingleton<MainViewModel>();
+		builder.Services.AddSingleton<AppShellViewModel>();
+		builder.Services.AddTransient<LoginViewModel>();
 		
 		// Registrar Views
 		builder.Services.AddSingleton<MainPage>();
+		builder.Services.AddSingleton<AppShell>();
+		builder.Services.AddTransient<LoginPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

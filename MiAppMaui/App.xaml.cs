@@ -1,4 +1,6 @@
-﻿namespace MiAppMaui;
+﻿using MiAppMaui.Services;
+
+namespace MiAppMaui;
 
 public partial class App : Application
 {
@@ -9,6 +11,14 @@ public partial class App : Application
 
 	protected override Window CreateWindow(IActivationState? activationState)
 	{
-		return new Window(new AppShell());
+		// Obtener el AppShell del contenedor de servicios
+		var appShell = Handler?.MauiContext?.Services.GetService<AppShell>();
+		
+		if (appShell == null)
+		{
+			throw new InvalidOperationException("AppShell no está registrado en DI");
+		}
+		
+		return new Window(appShell);
 	}
 }
