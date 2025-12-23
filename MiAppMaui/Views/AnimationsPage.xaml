@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MiAppMaui.ViewModels"
+             x:Class="MiAppMaui.Views.AnimationsPage"
+             x:DataType="vm:AnimationsViewModel"
+             Title="{Binding Title}">
+    
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            
+            <!-- Header -->
+            <Label Text="🎬 Animaciones Impresionantes"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,10"/>
+            
+            <Label Text="Toca los botones para ver las animaciones"
+                   FontSize="14"
+                   TextColor="{StaticResource Gray600}"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,20"/>
+
+            <!-- Fade Animation -->
+            <Frame Padding="20" 
+                   BackgroundColor="{StaticResource Primary}"
+                   CornerRadius="15"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="💫 Fade Animation"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    
+                    <BoxView Color="White"
+                             HeightRequest="100"
+                             WidthRequest="100"
+                             CornerRadius="15"
+                             HorizontalOptions="Center"
+                             Opacity="{Binding FadeOpacity}"/>
+                    
+                    <Button Text="Animar Fade"
+                            Command="{Binding FadeAnimationCommand}"
+                            BackgroundColor="White"
+                            TextColor="{StaticResource Primary}"
+                            CornerRadius="10"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Slide Animation -->
+            <Frame Padding="20"
+                   BackgroundColor="{StaticResource Secondary}"
+                   CornerRadius="15"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="➡️ Slide Animation"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    
+                    <Grid HeightRequest="100">
+                        <BoxView Color="White"
+                                 HeightRequest="80"
+                                 WidthRequest="80"
+                                 CornerRadius="40"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Start"
+                                 TranslationX="{Binding SlideX}"/>
+                    </Grid>
+                    
+                    <Button Text="Animar Slide"
+                            Command="{Binding SlideAnimationCommand}"
+                            BackgroundColor="White"
+                            TextColor="{StaticResource Secondary}"
+                            CornerRadius="10"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Scale Animation -->
+            <Frame Padding="20"
+                   BackgroundColor="{StaticResource Tertiary}"
+                   CornerRadius="15"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="🔍 Scale Animation"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    
+                    <Image Source="dotnet_bot.png"
+                           HeightRequest="80"
+                           WidthRequest="80"
+                           HorizontalOptions="Center"
+                           Scale="{Binding ScaleValue}"/>
+                    
+                    <Button Text="Animar Scale"
+                            Command="{Binding ScaleAnimationCommand}"
+                            BackgroundColor="White"
+                            TextColor="{StaticResource Tertiary}"
+                            CornerRadius="10"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Rotation Animation -->
+            <Frame Padding="20"
+                   BackgroundColor="#FF6B6B"
+                   CornerRadius="15"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="🔄 Rotation Animation"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    
+                    <Label Text="⭐"
+                           FontSize="60"
+                           HorizontalOptions="Center"
+                           Rotation="{Binding RotationAngle}"/>
+                    
+                    <Button Text="Animar Rotación"
+                            Command="{Binding RotateAnimationCommand}"
+                            BackgroundColor="White"
+                            TextColor="#FF6B6B"
+                            CornerRadius="10"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Bounce Animation -->
+            <Frame Padding="20"
+                   BackgroundColor="#4ECDC4"
+                   CornerRadius="15"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="⚡ Bounce Animation"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    
+                    <Grid HeightRequest="120">
+                        <Label Text="🏀"
+                               FontSize="50"
+                               VerticalOptions="End"
+                               HorizontalOptions="Center"
+                               TranslationY="{Binding SlideX}"/>
+                    </Grid>
+                    
+                    <Button Text="Animar Bounce"
+                            Command="{Binding BounceAnimationCommand}"
+                            BackgroundColor="White"
+                            TextColor="#4ECDC4"
+                            CornerRadius="10"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Combo Animation -->
+            <Frame Padding="20"
+                   BackgroundColor="#A29BFE"
+                   CornerRadius="15"
+                   HasShadow="True"
+                   Margin="0,0,0,20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="✨ Combo Animation"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    
+                    <Label Text="🎨"
+                           FontSize="60"
+                           HorizontalOptions="Center"
+                           Opacity="{Binding FadeOpacity}"
+                           Scale="{Binding ScaleValue}"
+                           Rotation="{Binding RotationAngle}"/>
+                    
+                    <Button Text="¡Animar Todo!"
+                            Command="{Binding ComboAnimationCommand}"
+                            BackgroundColor="White"
+                            TextColor="#A29BFE"
+                            CornerRadius="10"
+                            FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
