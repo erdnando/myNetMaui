@@ -4,11 +4,84 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:MiAppMaui.Views"
-    Title="MiAppMaui">
+    xmlns:vm="clr-namespace:MiAppMaui.ViewModels"
+    x:DataType="vm:AppShellViewModel"
+    Title="MiAppMaui"
+    FlyoutBehavior="Flyout">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate views:MainPage}"
-        Route="MainPage" />
+    <!-- Header del Flyout con foto de usuario -->
+    <Shell.FlyoutHeader>
+        <Grid Padding="20"
+              BackgroundColor="#512BD4"
+              HeightRequest="200">
+            <VerticalStackLayout Spacing="10"
+                               VerticalOptions="Center">
+                
+                <!-- Foto de perfil -->
+                <Frame CornerRadius="50"
+                       HeightRequest="100"
+                       WidthRequest="100"
+                       Padding="0"
+                       HorizontalOptions="Center"
+                       IsClippedToBounds="True"
+                       BorderColor="White"
+                       HasShadow="False">
+                    <Image Source="{Binding UserPhotoUrl}"
+                           Aspect="AspectFill"
+                           HeightRequest="100"
+                           WidthRequest="100"/>
+                </Frame>
+
+                <!-- Nombre del usuario -->
+                <Label Text="{Binding UserName}"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+
+                <!-- Email del usuario -->
+                <Label Text="{Binding UserEmail}"
+                       FontSize="12"
+                       TextColor="White"
+                       Opacity="0.9"
+                       HorizontalOptions="Center"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="1"
+                       Margin="10,0"/>
+                       
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <!-- Contenido del menú -->
+    <FlyoutItem Title="Inicio">
+        <ShellContent
+            Title="Login"
+            ContentTemplate="{DataTemplate views:LoginPage}"
+            Route="LoginPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Mi Perfil"
+                IsVisible="{Binding IsLoggedIn}">
+        <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate views:MainPage}"
+            Route="MainPage" />
+    </FlyoutItem>
+
+    <!-- Footer del Flyout con botón de cerrar sesión -->
+    <Shell.FlyoutFooter>
+        <Grid Padding="20"
+              BackgroundColor="#E1E1E1"
+              IsVisible="{Binding IsLoggedIn}">
+            <Button Text="Cerrar Sesión"
+                    Command="{Binding SignOutCommand}"
+                    BackgroundColor="#EF4444"
+                    TextColor="White"
+                    CornerRadius="10"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Fill"/>
+        </Grid>
+    </Shell.FlyoutFooter>
 
 </Shell>

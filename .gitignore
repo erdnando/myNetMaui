@@ -1,6 +1,9 @@
 # .NET MAUI - Git Ignore File
 # Generado para el proyecto MiAppMaui
 
+## 🔒 SECRETS - Archivos con credenciales sensibles
+**/Secrets.cs
+
 ## User-specific files
 *.rsuser
 *.suo
