@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MiAppMaui.ViewModels"
+             x:Class="MiAppMaui.Views.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="*,Auto,*" 
+          Padding="20">
+        
+        <!-- Fondo con gradiente -->
+        <BoxView Grid.RowSpan="3"
+                 Color="{StaticResource Primary}"
+                 Opacity="0.1"/>
+
+        <!-- Contenido central -->
+        <VerticalStackLayout Grid.Row="1"
+                           Spacing="30"
+                           VerticalOptions="Center">
+
+            <!-- Logo o Icono de la app -->
+            <Image Source="dotnet_bot.png"
+                   HeightRequest="120"
+                   WidthRequest="120"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,20"/>
+
+            <!-- Título -->
+            <Label Text="MiApp MAUI"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource Primary}"/>
+
+            <Label Text="Bienvenido"
+                   FontSize="18"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource Gray600}"/>
+
+            <!-- Estado de usuario logueado -->
+            <VerticalStackLayout IsVisible="{Binding IsLoggedIn}"
+                               Spacing="15"
+                               Margin="0,20,0,0">
+                
+                <!-- Foto de perfil -->
+                <Frame CornerRadius="60"
+                       HeightRequest="120"
+                       WidthRequest="120"
+                       Padding="0"
+                       HorizontalOptions="Center"
+                       IsClippedToBounds="True"
+                       BorderColor="{StaticResource Primary}"
+                       HasShadow="True">
+                    <Image Source="{Binding UserPhotoUrl}"
+                           Aspect="AspectFill"
+                           HeightRequest="120"
+                           WidthRequest="120"/>
+                </Frame>
+
+                <!-- Nombre -->
+                <Label Text="{Binding UserName}"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       TextColor="{StaticResource Primary}"/>
+
+                <!-- Email -->
+                <Label Text="{Binding UserEmail}"
+                       FontSize="14"
+                       HorizontalOptions="Center"
+                       TextColor="{StaticResource Gray600}"/>
+
+            </VerticalStackLayout>
+
+            <!-- Mensaje de estado -->
+            <Label Text="{Binding StatusMessage}"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource Gray600}"
+                   Margin="0,20,0,0"/>
+
+            <!-- Botón de Google Sign-In -->
+            <Button IsVisible="{Binding IsLoggedIn, Converter={StaticResource InvertedBoolConverter}}"
+                    Text="Continuar con Google"
+                    Command="{Binding SignInWithGoogleCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    HorizontalOptions="Center"
+                    WidthRequest="280"
+                    HeightRequest="50"
+                    CornerRadius="25"
+                    BackgroundColor="White"
+                    TextColor="{StaticResource Gray900}"
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    BorderColor="{StaticResource Gray300}"
+                    BorderWidth="1">
+                <Button.Shadow>
+                    <Shadow Brush="Black"
+                            Opacity="0.1"
+                            Radius="10"
+                            Offset="0,2"/>
+                </Button.Shadow>
+            </Button>
+
+            <!-- Indicador de carga -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                             IsVisible="{Binding IsBusy}"
+                             Color="{StaticResource Primary}"
+                             HeightRequest="40"
+                             WidthRequest="40"
+                             HorizontalOptions="Center"/>
+
+            <!-- Botón de cerrar sesión -->
+            <Button IsVisible="{Binding IsLoggedIn}"
+                    Text="Cerrar Sesión"
+                    Command="{Binding SignOutCommand}"
+                    HorizontalOptions="Center"
+                    WidthRequest="200"
+                    BackgroundColor="{StaticResource Gray200}"
+                    TextColor="{StaticResource Gray900}"
+                    Margin="0,20,0,0"/>
+
+            <!-- Botón para ir a MainPage (si ya está logueado) -->
+            <Button IsVisible="{Binding IsLoggedIn}"
+                    Text="Ir a la App"
+                    Command="{Binding NavigateToMainCommand}"
+                    HorizontalOptions="Center"
+                    WidthRequest="200"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"/>
+
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>
